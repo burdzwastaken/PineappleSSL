@@ -87,4 +87,4 @@ After you write the nginx configuration, you need to restart nginx in order to p
 We've now configured nginx to use the private key and certificate we generated to facilitate ssl/tls connections with clients.
 
 ##Results
-Go to your browser and type [http://172.16.42.1:1471]([http://172.16.42.1:1471), you should see a *bad request* page. Try again with https: [https://172.16.42.1:1471]([https://172.16.42.1:1471). You will now be sent to a page that warns you that your connection is not private as it is using a self-signed certificate. However, this is exactly what we want, click advanced and then proceed to your pineapples login page over SSL.
+Go to your browser and type [http://172.16.42.1:1471]([http://172.16.42.1:1471), you should see a *bad request* page. Try again with https: [https://172.16.42.1:1471]([https://172.16.42.1:1471). You will now be sent to a page that warns you that your connection is not private as it is using a self-signed certificate. However, this is exactly what we want; click advanced and then proceed to your pineapples login page over SSL.
