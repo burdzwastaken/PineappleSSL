@@ -9,7 +9,7 @@ You have a Wi-Fi Pineapple and want to harness all its power yet everytime you a
 First join your pineapples network so you can access the shell. Login into your Pineapple via SSH. After you are in the terminal you won't need to us Sudo or su as you will already have root. You will need to enter your password to get into it and once you have a shell do some updates using the following command - **opkg update**. After your Pineapple is updated make sure the libopenssl and openssl_utils are installed by entering - **opkg install libopenssl** and **opkg install openssl_util**. 
 
 ###New SSL config
-After you have updated and installed the above librarys you are going to need to copy across my new openssl config. Enter the follow commands to get to the directory and make a copy of the current one just in case. After you are in the file you want to paste the configuration that is in my repositories under the name **openssl.conf**. To exit vi/vim you will need to press **ESC**, type **:** and **wq** and press **Enter**.
+After you have updated and installed the above librarys you are going to need to copy across my new openssl config. Enter the follow commands to get to the directory and make a copy of the current one just in case. After you are in the file you want to paste the configuration that is in my repositories under the name **openssl.conf**. To exit vi/vim you will need to press **ESC**, type **:** and **wq** then press **Enter**.
 - **cd /etc/ssl**
 - **ls**
 - **cp openssl.cnf openssl.conf.old**
