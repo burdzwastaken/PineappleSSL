@@ -8,21 +8,21 @@ Essentially, we are going to configure nginx (the Pineapple's server of choice) 
 
 ##Steps
 ###Login and get updated
-First join your Pineapple's network so you can access the shell. Login to your Pineapple via SSH. 
+First join your Pineapple's network so you can access the shell. Login to your Pineapple via SSH:
 
     $ ssh root@172.16.42.1
 
-You will need to enter the root password created during setup to acceses the device. After you have access to the terminal, make sure the system is up-to-date using the following command. *(For the `opkg` steps, you'll need to have your Pineapple connected to the internet. The easiest way to do so is simply connect the second radio (wlan1) to a wifi network in "client mode".)*: 
+You will need to enter the root password created during setup to acceses the device. After you have access to the terminal, make sure the system is up-to-date using the following command. *For the `opkg` steps, you'll need to have your Pineapple connected to the internet. The easiest way to do so is simply connect the second radio (wlan1) to a wifi network in "client mode".*
 
     # opkg update
   
-After your Pineapple is updated, make sure the `libopenssl` and `openssl_utils` packages are installed:
+Once your Pineapple's package information is updated, install the `libopenssl` and `openssl_utils` packages:
 
     # opkg install libopenssl
     # opkg install openssl_util 
 
 ###SSL config
-After you have updated and installed the above libraries, copy over the openssl config from this repository. Enter the following commands to get to the config directory on the Pineapple, and make a copy of the current config just in case:
+After you have installed the above libraries, copy over the openssl config from this repository. Enter the following commands to get to the config directory on the Pineapple, and make a copy of the current config just in case:
 
     # cd /etc/ssl
     # openssl.cnf openssl.conf.old
@@ -33,7 +33,7 @@ Write a new `openssl.cnf` file and paste in my openssl configuration. The pinapp
 
 Type `i` to enter insert mode, and then paste the configuration. Type `:wq` and then `enter` to save the file. Or, replace `vi` with `nano`, paste the contents, and type `crtl+o` to write the buffer to disk. 
 
-Alternatively, you can checkout my repository and `scp` the file to the Pineapple. On your machine:
+Alternatively, you can checkout this repository (or download the file independently) and `scp` the file to the Pineapple. On your machine, execute:
 
     $ git clone git@github.com:burdzz/PineappleSSL.git
     $ cd PineappleSSL
@@ -46,20 +46,20 @@ For this section, you'll want to be in the ssl certs directory on the Pineapple:
 
     # cd /etc/ssl/certs
   
-Then, create the keys for both our CA and nginx:
+Then, create the keys for both our CA and nginx,
 
     # openssl genrsa -aes128 -out server.key 2048
     # openssl genrsa -aes128 -out ca.key 2048
     
-Remove the pass phrase on the server's private key:
+and remove the pass phrase on the server's private key,
 
     # openssl rsa -in server.key -out server.key
 
-Now, we're going to generate our root certificate:
+Now, we're going to generate our root certificate,
 
     # openssl req -new -x509 -days 3650 -key ca.key -out ca.pem
 
-create a signing request for the nginx key:
+create a signing request for the nginx key,
 
     # openssl req -new -key server.key -out server.csr
     
@@ -78,7 +78,7 @@ and then backup the old configuration:
 
     # mv nginx.conf nginx.conf.old
 
-Copy the contents of my `nginx.conf` to a new file on the Pineapple using whatever methods you used previously for the `openssl.conf`. file. 
+Copy the contents of the `nginx.conf` from this repossitory to a new conf file on the Pineapple using whatever method you used previously for the `openssl.conf`. file. 
 
 After you write the nginx configuration, you need to restart nginx in order to pickup the changes:
 
