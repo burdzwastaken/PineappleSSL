@@ -27,7 +27,7 @@ After you have installed the above libraries, copy over the openssl config from 
     # cd /etc/ssl
     # openssl.cnf openssl.conf.old
 
-Write a new `openssl.cnf` file and paste in my openssl configuration. The pinapple ships with `vi`/`vim` and `nano`. For vi:
+Write a new `openssl.cnf` file and paste in my openssl configuration. The pinapple ships with `vi`/`vim` and `nano`. For `vi`:
 
     # vi openssl.cnf
 
