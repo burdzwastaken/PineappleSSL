@@ -78,7 +78,7 @@ and then backup the old configuration:
 
     # mv nginx.conf nginx.conf.old
 
-Copy the contents of the `nginx.conf` from this repossitory to a new conf file on the Pineapple using whatever method you used previously for the `openssl.conf`. file. 
+Copy the contents of the `nginx.conf` from this repossitory to a new conf file on the Pineapple using whatever method you used previously for the `openssl.conf` file. 
 
 After you write the nginx configuration, you need to restart nginx in order to pickup the changes:
 
