@@ -2,38 +2,89 @@
 A way to force your pineapple to use SSL
 
 ##Introduction
-You have a Wi-Fi Pineapple and want to harness all its power yet everytime you are logging into it this is done over http. Your username and passwords are being sent unencrypted over the network so the wrong people could get access to it. I will show you how to change this so all the network traffic is encrypted. 
+You have a Wi-Fi Pineapple and want to harness all its power yet, everytime you log into it, you are doing so over http. Your username and passwords are being sent unencrypted over the network so the wrong people could get access to them. This guide will show you how to congigure your Pineapple so all the network traffic is encrypted.
+
+Essentially, we are going to configure nginx (the Pineapple's server of choice) to use a self-signed certificate for https connections. To do this we need to generate a root certificate, configure openssl to act as a certificate authority, and generate an ssl certificate (signed by our root cert) for nginx to use so that clients can initiate an https connection to the Pineapple.
 
 ##Steps
 ###Login and get updated
-First join your pineapples network so you can access the shell. Login into your Pineapple via SSH. After you are in the terminal you won't need to us Sudo or su as you will already have root. You will need to enter your password to get into it and once you have a shell do some updates using the following command - **opkg update**. After your Pineapple is updated make sure the libopenssl and openssl_utils are installed by entering - **opkg install libopenssl** and **opkg install openssl_util**. 
+First join your Pineapple's network so you can access the shell. Login to your Pineapple via SSH. 
 
-###New SSL config
-After you have updated and installed the above librarys you are going to need to copy across my new openssl config. Enter the follow commands to get to the directory and make a copy of the current one just in case. After you are in the file you want to paste the configuration that is in my repositories under the name **openssl.conf**. To exit vi/vim you will need to press **ESC**, type **:** and **wq** then press **Enter**.
-- **cd /etc/ssl**
-- **ls**
-- **cp openssl.cnf openssl.conf.old**
-- **rm openssl.cnf** 
-- **vi openssl.cnf**
+    $ ssh root@172.16.42.1
+
+You will need to enter the root password created during setup to acceses the device. After you have access to the terminal, make sure the system is up-to-date using the following command. *(For the `opkg` steps, you'll need to have your Pineapple connected to the internet. The easiest way to do so is simply connect the second radio (wlan1) to a wifi network in "client mode".)*: 
+
+    # opkg update
+  
+After your Pineapple is updated, make sure the `libopenssl` and `openssl_utils` packages are installed:
+
+    # opkg install libopenssl
+    # opkg install openssl_util 
+
+###SSL config
+After you have updated and installed the above libraries, copy over the openssl config from this repository. Enter the following commands to get to the config directory on the Pineapple, and make a copy of the current config just in case:
+
+    # cd /etc/ssl
+    # openssl.cnf openssl.conf.old
+
+Write a new `openssl.cnf` file and paste in my openssl configuration. The pinapple ships with `vi`/`vim` and `nano`. For vi:
+
+    # vi openssl.cnf
+
+Type `i` to enter insert mode, and then paste the configuration. Type `:wq` and then `enter` to save the file. Or, replace `vi` with `nano`, paste the contents, and type `crtl+o` to write the buffer to disk. 
+
+Alternatively, you can checkout my repository and `scp` the file to the Pineapple. On your machine:
+
+    $ git clone git@github.com:burdzz/PineappleSSL.git
+    $ cd PineappleSSL
+    $ scp openssl.cnf root@172.16.42.1:/etc/ssl/openssl.cnf
+
+The configuration sets some basic values so the openssl library we just installed can process certificate signing requests using keys and a certificate we are going to generate.
 
 ###Creating the SSL/TLS certs
-You are going to want to go to the directory ssl certs by typing the command **cd /etc/ssl/certs** and then you are going to want to creating the keys by typing the following 
+For this section, you'll want to be in the ssl certs directory on the Pineapple:
 
-- **openssl genrsa -aes128 -out server.key 2048**
-- **openssl genrsa -aes128 -out ca.key 2048**
-- **openssl rsa -in server.key -out server.key**
-- **openssl req -new -x509 -days 3650 -key ca.key -out ca.pem**
-- **openssl req -new -key server.key -out server.csr**
-- **openssl x509 -req -days 3650 -in server.csr -CA ca.pem -CAkey ca.key -set_serial 01 -out server.pem**
+    # cd /etc/ssl/certs
+  
+Then, create the keys for both our CA and nginx:
 
-###New NGINX config
-To get to the nginx config you are going to want to get to the nginx directory and then make a copy of the old configuration. After you enter vim remember how to exit by pressing **ESC**, type **:** and **wq** and press **Enter**. Once you are in the file you are going to want to paste what is in my repository named **nginx.conf**. 
+    # openssl genrsa -aes128 -out server.key 2048
+    # openssl genrsa -aes128 -out ca.key 2048
+    
+Remove the pass phrase on the server's private key:
 
-- **cd /etc/nginx**
-- **cp nginx.conf nginx.conf.old**
-- **vi nginx.conf**
+    # openssl rsa -in server.key -out server.key
 
-After you close the nginx.conf you are going to want to restart the nginx service by typing **/etc/init.d/nginx restart**.
+Now, we're going to generate our root certificate:
+
+    # openssl req -new -x509 -days 3650 -key ca.key -out ca.pem
+
+create a signing request for the nginx key:
+
+    # openssl req -new -key server.key -out server.csr
+    
+and process the CSR using our root certificate:
+
+    # openssl x509 -req -days 3650 -in server.csr -CA ca.pem -CAkey ca.key -set_serial 01 -out server.pem
+
+Finally, we just need to configure nginx to use our new self-signed certificate.
+
+###NGINX config
+The nginx config is located in the nginx directory. Navigate there:
+
+    # cd /etc/nginx
+
+and then backup the old configuration:
+
+    # mv nginx.conf nginx.conf.old
+
+Copy the contents of my `nginx.conf` to a new file on the Pineapple using whatever methods you used previously for the `openssl.conf`. file. 
+
+After you write the nginx configuration, you need to restart nginx in order to pickup the changes:
+
+    # /etc/init.d/nginx restart
+
+We've now configured nginx to use the private key and certificate we generated to facilitate ssl/tls connections with clients.
 
 ##Results
-After this you will want to go to your browser and type [http://172.16.42.1:1471/#] and see the result, you should get a bad request. Then try go here [https://172.16.42.1:1471/#]. See the results, you will now be sent to a page that warns you that your connection is not private as it is a self signed certificate. however click advanced and then proceed to your pineapples login page over SSL.
+Go to your browser and type [http://172.16.42.1:1471]([http://172.16.42.1:1471), you should see a *bad request* page. Try again with https: [https://172.16.42.1:1471]([https://172.16.42.1:1471). You will now be sent to a page that warns you that your connection is not private as it is using a self-signed certificate. However, this is exactly what we want, click advanced and then proceed to your pineapples login page over SSL.
