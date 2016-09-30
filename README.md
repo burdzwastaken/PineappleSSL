@@ -19,7 +19,7 @@ You will need to enter the root password created during setup to acceses the dev
 Once your Pineapple's package information is updated, install the `libopenssl` and `openssl_utils` packages:
 
     # opkg install libopenssl
-    # opkg install openssl_util 
+    # opkg install openssl-util 
 
 ###SSL config
 After you have installed the above libraries, copy over the openssl config from this repository. Enter the following commands to get to the config directory on the Pineapple, and make a copy of the current config just in case:
