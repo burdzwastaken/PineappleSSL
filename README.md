@@ -2,7 +2,7 @@
 A way to force your pineapple to use SSL
 
 ##Introduction
-You have a Wi-Fi Pineapple and want to harness all its power yet, everytime you log into it, you are doing so over http. Your username and passwords are being sent unencrypted over the network so the wrong people could get access to them. This guide will show you how to congigure your Pineapple so all the network traffic is encrypted.
+You have a Wi-Fi Pineapple and want to harness all its power yet, everytime you log into it, you are doing so over http. Your username and passwords are being sent unencrypted over the network so the wrong people could get access to them. This guide will show you how to configure your Pineapple so all the network traffic is encrypted.
 
 Essentially, we are going to configure nginx (the Pineapple's server of choice) to use a self-signed certificate for https connections. To do this we need to generate a root certificate, configure openssl to act as a certificate authority, and generate an ssl certificate (signed by our root cert) for nginx to use so that clients can initiate an https connection to the Pineapple.
 
@@ -78,7 +78,7 @@ and then backup the old configuration:
 
     # mv nginx.conf nginx.conf.old
 
-Copy the contents of the `nginx.conf` from this repossitory to a new conf file on the Pineapple using whatever method you used previously for the `openssl.conf` file. 
+Copy the contents of the `nginx.conf` from this repository to a new conf file on the Pineapple using whatever method you used previously for the `openssl.conf` file. 
 
 After you write the nginx configuration, you need to restart nginx in order to pickup the changes:
 
@@ -88,3 +88,4 @@ We've now configured nginx to use the private key and certificate we generated t
 
 ##Results
 Go to your browser and type [http://172.16.42.1:1471]([http://172.16.42.1:1471), you should see a *bad request* page. Try again with https: [https://172.16.42.1:1471]([https://172.16.42.1:1471). You will now be sent to a page that warns you that your connection is not private as it is using a self-signed certificate. However, this is exactly what we want; click advanced and then proceed to your pineapples login page over SSL.
+
